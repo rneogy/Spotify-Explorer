@@ -3,3 +3,23 @@
 body {
     font-family: 'Questrial', 'sans-serif';
 }
+
+.chart {
+    position: fixed;
+    top: 10vh;
+    left: 0;
+    width: 100vw;
+    height: 90vh;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+text {
+    fill: black;
+}
+
+.transition {
+    transition: 300ms;
+}
