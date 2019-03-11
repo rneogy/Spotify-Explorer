@@ -51,6 +51,7 @@ d3.csv("./processed_data.csv").then(data => {
 
   const group = fDataEnter
     .append("g")
+    .classed("circle-group", true)
     .attr(
       "transform",
       d => `translate(${x(parseTime(d.Date))}, ${(2 * height) / 3})`
@@ -98,6 +99,7 @@ d3.csv("./processed_data.csv").then(data => {
 
   fDataEnter
     .append("text")
+    .classed("tooltip", true)
     .text(d => d["Track Name"])
     .attrs((d, i) => {
       return {
@@ -111,6 +113,7 @@ d3.csv("./processed_data.csv").then(data => {
   d3.select(".chart")
     .append("g")
     .attr("transform", `translate(0,${height - padding})`)
+    .attr("id", "x-axis")
     .call(d3.axisBottom().scale(x));
 
   select.on("change", function() {
@@ -126,20 +129,27 @@ d3.csv("./processed_data.csv").then(data => {
 
     const circles = d3
       .select(".chart")
-      .selectAll("g")
+      .selectAll("g.circle-group")
       .data(newData);
 
-    circles.exit().remove();
     circles
+      .exit()
+      .transition()
+      .duration(1000)
+      .style("opacity", 0)
+      .remove();
+
+    const newGroups = circles
       .enter()
       .append("g")
+      .classed("circle-group", true)
       .attr(
         "transform",
         d => `translate(${x(parseTime(d.Date))}, ${(2 * height) / 3})`
       )
       .style("opacity", 0);
 
-    circles
+    newGroups
       .transition()
       .duration(2000)
       .attr(
@@ -147,6 +157,43 @@ d3.csv("./processed_data.csv").then(data => {
         d => `translate(${x(parseTime(d.Date))}, ${y(parseInt(d.Streams))})`
       )
       .style("opacity", 1);
+
+    newGroups
+      .append("circle")
+      .attrs(d => {
+        return {
+          cx: 0,
+          cy: 0,
+          r: r(parseInt(d.Streams)),
+          "stroke-width": 2,
+          stroke: "black"
+        };
+      })
+      .style("fill", d => color(parseInt(d.Streams)))
+      .on("mouseover", function(_, i) {
+        d3.select("#tooltip-" + i)
+          .classed("hidden", false)
+          .style("opacity", 0)
+          .transition()
+          .duration(200)
+          .style("opacity", 1);
+      })
+      .on("mouseout", function(_, i) {
+        const tooltip = d3.select("#tooltip-" + i);
+        tooltip
+          .transition()
+          .duration(200)
+          .style("opacity", 0)
+          .on("end", () => tooltip.classed("hidden", true));
+      });
+
+    circles
+      .transition()
+      .duration(2000)
+      .attr(
+        "transform",
+        d => `translate(${x(parseTime(d.Date))}, ${y(parseInt(d.Streams))})`
+      );
 
     circles
       .select("circle")
@@ -157,17 +204,27 @@ d3.csv("./processed_data.csv").then(data => {
 
     const tooltips = d3
       .select(".chart")
-      .selectAll("text")
+      .selectAll("text.tooltip")
       .data(newData);
-    
+
     tooltips.exit().remove();
 
-    tooltips.enter()
+    tooltips
+      .enter()
       .append("text")
-      .classed("hidden", true);
-    
-    tooltips.transition()
-      .duration(2000)
+      .classed("tooltip", true)
+      .classed("hidden", true)
+      .text(d => d["Track Name"])
+      .attrs((d, i) => {
+        return {
+          id: "tooltip-" + i,
+          x: x(parseTime(d.Date)),
+          y: y(parseInt(d.Streams)) - padding,
+          "text-anchor": "middle"
+        };
+      });
+
+    tooltips
       .text(d => d["Track Name"])
       .attrs((d, i) => {
         return {
