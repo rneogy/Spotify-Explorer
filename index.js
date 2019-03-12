@@ -14,7 +14,8 @@ String.prototype.hashCode = function() {
 let width = window.innerWidth;
 let height = 0.9 * window.innerHeight;
 const padding = 30;
-const defaultOpacity = 0.8;
+const defaultOpacity = 0.7;
+const highlightOpacity = 0.85;
 const selectedOpacity = 1;
 const deselectedOpacity = 0.3;
 
@@ -34,8 +35,9 @@ const highlightSong = d => {
   }
   d3.selectAll(`circle[songHash="${d["Track Name"].hashCode()}"]`)
     .transition()
-    .attr("opacity", defaultOpacity)
-    .attr("stroke", "yellow");
+    .attr("opacity", highlightOpacity)
+    .attr("stroke", "yellow")
+    .attr("stroke-width", 3);
 };
 
 const selectSong = d => {
@@ -51,23 +53,26 @@ const selectSong = d => {
   d3.selectAll(`circle[songHash="${d["Track Name"].hashCode()}"]`)
     .transition()
     .attr("stroke", "orange")
+    .attr("stroke-width", 3)
     .attr("opacity", selectedOpacity);
   d3.selectAll(`circle:not([songHash="${d["Track Name"].hashCode()}"])`)
     .transition()
     .attr("stroke", "black")
+    .attr("stroke-width", 2)
     .attr("opacity", deselectedOpacity);
 };
 
 const unhighlightSong = d => {
+  songText.innerText = "";
+  streamCountText.innerText = "";
   if (selectedSong && d["Track Name"] === selectedSong) {
     return;
   }
-  songText.innerText = "";
-  streamCountText.innerText = "";
   d3.selectAll(`circle[songHash="${d["Track Name"].hashCode()}"]`)
     .transition()
     .attr("stroke", "black")
-    .attr("opacity", selectedSong ? deselectedOpacity : defaultOpacity);
+    .attr("opacity", selectedSong ? deselectedOpacity : defaultOpacity)
+    .attr("stroke-width", 2);
 };
 
 const unselectSong = () => {
@@ -75,6 +80,7 @@ const unselectSong = () => {
   d3.selectAll("circle")
     .transition()
     .attr("stroke", "black")
+    .attr("stroke-width", 2)
     .attr("opacity", defaultOpacity);
 };
 
@@ -213,14 +219,27 @@ d3.csv("./country_codes.csv").then(codes => {
           song: d => d["Track Name"],
           URL: d => d.URL,
           songHash: d => d["Track Name"].hashCode(),
-          r: d => r(parseInt(d.Streams))
+          r: d => r(parseInt(d.Streams)),
+          opacity: defaultOpacity,
+          stroke: "black"
         })
         .style("fill", d => color(parseInt(d.Streams)));
+
+      if (selectedSong) {
+        selectedSong = "";
+      }
     };
 
     select.on("change", render);
 
     window.addEventListener("resize", render);
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && selectedSong) {
+        unselectSong();
+        selectedSong = "";
+      }
+    });
 
     render();
   });
