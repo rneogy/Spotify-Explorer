@@ -4,6 +4,16 @@ const padding = 30;
 
 const parseTime = d3.timeParse("%Y-%m-%d");
 
+const songText = document.querySelector("#song-text");
+const streamCountText = document.querySelector("#stream-count-text");
+const selectedSongText = document.querySelector("#selected-song-text");
+const selectedStreamCountText = document.querySelector(
+  "#selected-stream-count-text"
+);
+
+let selectedSong;
+let selectedDate;
+
 const x = d3
   .scaleTime()
   .domain([new Date(2017, 0, 1), new Date(2018, 0, 8)])
@@ -60,7 +70,7 @@ d3.csv("./processed_data.csv").then(data => {
     streamExtent = d3.extent(newData, d => parseInt(d.Streams));
 
     y.domain(streamExtent)
-      .range([height - padding * 1.5, padding * 2])
+      .range([height - padding * 1.5, padding])
       .nice();
     r.domain(streamExtent);
     color.domain(streamExtent);
@@ -91,6 +101,37 @@ d3.csv("./processed_data.csv").then(data => {
       .attr("stroke-width", 0)
       .remove();
 
+    const highlightSong = (song, streams) => {
+      songText.innerText = song;
+      streamCountText.innerText = streams / 1e3 + "k streams";
+      d3.selectAll(`circle[song="${song}"]`)
+        .transition()
+        .attr("stroke", "yellow");
+    };
+
+    const selectSong = (song, streams, el) => {
+      selectedSongText.innerText = "Selected: " + song;
+      selectedStreamCountText.innerText = streams / 1e3 + "k streams";
+      d3.select(el).transition()
+        .attr("stroke", "blue");
+    };
+
+    const unhighlightSong = song => {
+      songText.innerText = "";
+      streamCountText.innerText = "";
+      d3.selectAll(`circle[song="${song}"]`)
+        .filter((d) => !(d.Date === selectedDate && d["Track Name"] === selectedSong))
+        .transition()
+        .attr("stroke", "black");
+    };
+
+    const unselectSong = (el) => {
+      selectedSongText.innerText = "";
+      selectedStreamCountText.innerText = "";
+      d3.select(el).transition()
+        .attr("stroke", "black");
+    };
+
     const newCircles = circles
       .enter()
       .append("circle")
@@ -107,29 +148,19 @@ d3.csv("./processed_data.csv").then(data => {
         };
       })
       .style("fill", d => color(parseInt(d.Streams)))
-      .on("mouseover", function(d, i) {
-        d3.select("#tooltip-" + i)
-          .classed("hidden", false)
-          .style("opacity", 0)
-          .transition()
-          .duration(200)
-          .style("opacity", 1);
-        d3.selectAll(`circle[song="${d["Track Name"]}"]`).attr(
-          "stroke",
-          "yellow"
-        );
+      .on("mouseover", function(d) {
+        highlightSong(d["Track Name"], d.Streams);
       })
-      .on("mouseout", function(d, i) {
-        const tooltip = d3.select("#tooltip-" + i);
-        tooltip
-          .transition()
-          .duration(200)
-          .style("opacity", 0)
-          .on("end", () => tooltip.classed("hidden", true));
-        d3.selectAll(`circle[song="${d["Track Name"]}"]`).attr(
-          "stroke",
-          "black"
-        );
+      .on("mouseout", function(d) {
+        unhighlightSong(d["Track Name"]);
+      })
+      .on("click", function(d) {
+        if (selectedSong) {
+          unselectSong(selectedSong);
+        }
+        selectedSong = this
+        selectedDate = d.Date;
+        selectSong(d["Track Name"], d.Streams, this);
       });
 
     newCircles
@@ -153,39 +184,6 @@ d3.csv("./processed_data.csv").then(data => {
         r: d => r(parseInt(d.Streams))
       })
       .style("fill", d => color(parseInt(d.Streams)));
-
-    const tooltips = d3
-      .select(".chart")
-      .selectAll("text.tooltip")
-      .data(newData);
-
-    tooltips.exit().remove();
-
-    tooltips
-      .enter()
-      .append("text")
-      .classed("tooltip", true)
-      .classed("hidden", true)
-      .text(d => d["Track Name"])
-      .attrs((d, i) => {
-        return {
-          id: "tooltip-" + i,
-          x: x(parseTime(d.Date)),
-          y: y(parseInt(d.Streams)) - padding,
-          "text-anchor": "middle"
-        };
-      });
-
-    tooltips
-      .text(d => d["Track Name"])
-      .attrs((d, i) => {
-        return {
-          id: "tooltip-" + i,
-          x: x(parseTime(d.Date)),
-          y: y(parseInt(d.Streams)) - padding,
-          "text-anchor": "middle"
-        };
-      });
   };
 
   select.on("change", render);
