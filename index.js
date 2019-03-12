@@ -85,7 +85,11 @@ const x = d3
 
 d3.csv("./country_codes.csv").then(codes => {
   d3.csv("./processed_data.csv").then(data => {
-    const regions = d3.map(data, d => d.Region).keys();
+    let regions = d3.map(data, d => d.Region).keys();
+    regions.splice(regions.indexOf("global"), 1)
+    regions.sort()
+    regions.unshift("global")
+
     const select = d3.select("#country-select");
     select
       .selectAll("option")
