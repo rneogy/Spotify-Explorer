@@ -1,5 +1,5 @@
-const width = window.innerWidth;
-const height = 0.9 * window.innerHeight;
+let width = window.innerWidth;
+let height = 0.9 * window.innerHeight;
 const padding = 30;
 
 const parseTime = d3.timeParse("%Y-%m-%d");
@@ -20,14 +20,13 @@ d3.csv("./processed_data.csv").then(data => {
     .attr("value", d => d)
     .text(d => d);
 
-  const y = d3
-    .scaleLinear()
-    .range([height - padding * 1.5, padding * 2])
-    .nice();
+  const y = d3.scaleLinear();
 
   const r = d3.scaleLog().range([5, 20]);
 
   const color = d3.scaleSequential().interpolator(d3.interpolateInferno);
+
+  const xAxis = d3.axisBottom().scale(x);
 
   d3.select(".chart")
     .append("g")
@@ -35,7 +34,7 @@ d3.csv("./processed_data.csv").then(data => {
     .attr("id", "x-axis")
     .transition()
     .duration(2000)
-    .call(d3.axisBottom().scale(x));
+    .call(xAxis);
 
   const yAxis = d3.axisRight(y).tickFormat(function(d) {
     const s = d / 1e3;
@@ -48,18 +47,31 @@ d3.csv("./processed_data.csv").then(data => {
     .attr("transform", `translate(${padding}, 0)`);
 
   const render = function() {
+    const region = document.querySelector("#country-select").value;
+    width = window.innerWidth;
+    height = 0.9 * window.innerHeight;
     const newData = data.filter(d => {
-      if (this.selectedIndex) {
-        return d.Region == this.options[this.selectedIndex].value;
+      if (region) {
+        return d.Region === region;
       }
-      return d.Region == regions[0];
+      return d.Region === regions[0];
     });
 
     streamExtent = d3.extent(newData, d => parseInt(d.Streams));
 
-    y.domain(streamExtent).nice();
+    y.domain(streamExtent)
+      .range([height - padding * 1.5, padding * 2])
+      .nice();
     r.domain(streamExtent);
     color.domain(streamExtent);
+
+    x.range([2.5 * padding, width - padding]);
+
+    d3.select("#x-axis")
+      .transition()
+      .duration(2000)
+      .attr("transform", `translate(0,${height - padding})`)
+      .call(xAxis);
 
     d3.select("#y-axis")
       .transition()
@@ -82,35 +94,42 @@ d3.csv("./processed_data.csv").then(data => {
     const newCircles = circles
       .enter()
       .append("circle")
-      .attr(
-        "transform",
-        d => `translate(${x(parseTime(d.Date))}, ${(2 * height) / 3})`
-      )
       .attrs(d => {
         return {
+          transform: `translate(${x(parseTime(d.Date))}, ${(2 * height) / 3})`,
           cx: 0,
           cy: 0,
           r: 0,
           "stroke-width": 0,
-          stroke: "black"
+          stroke: "black",
+          song: d["Track Name"],
+          opacity: 0.8
         };
       })
       .style("fill", d => color(parseInt(d.Streams)))
-      .on("mouseover", function(_, i) {
+      .on("mouseover", function(d, i) {
         d3.select("#tooltip-" + i)
           .classed("hidden", false)
           .style("opacity", 0)
           .transition()
           .duration(200)
           .style("opacity", 1);
+        d3.selectAll(`circle[song="${d["Track Name"]}"]`).attr(
+          "stroke",
+          "yellow"
+        );
       })
-      .on("mouseout", function(_, i) {
+      .on("mouseout", function(d, i) {
         const tooltip = d3.select("#tooltip-" + i);
         tooltip
           .transition()
           .duration(200)
           .style("opacity", 0)
           .on("end", () => tooltip.classed("hidden", true));
+        d3.selectAll(`circle[song="${d["Track Name"]}"]`).attr(
+          "stroke",
+          "black"
+        );
       });
 
     newCircles
@@ -127,11 +146,12 @@ d3.csv("./processed_data.csv").then(data => {
     circles
       .transition()
       .duration(2000)
-      .attr("r", d => r(parseInt(d.Streams)))
-      .attr(
-        "transform",
-        d => `translate(${x(parseTime(d.Date))}, ${y(parseInt(d.Streams))})`
-      )
+      .attrs({
+        transform: d =>
+          `translate(${x(parseTime(d.Date))}, ${y(parseInt(d.Streams))})`,
+        song: d => d["Track Name"],
+        r: d => r(parseInt(d.Streams))
+      })
       .style("fill", d => color(parseInt(d.Streams)));
 
     const tooltips = d3
@@ -169,6 +189,8 @@ d3.csv("./processed_data.csv").then(data => {
   };
 
   select.on("change", render);
+
+  window.addEventListener("resize", render);
 
   render();
 });
