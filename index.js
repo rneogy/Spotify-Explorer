@@ -108,6 +108,7 @@ d3.csv("./country_codes.csv").then(codes => {
             "stroke-width": 0,
             stroke: "black",
             song: d["Track Name"],
+            url: d["URL"],
             opacity: 0.8
           };
         })
@@ -119,7 +120,7 @@ d3.csv("./country_codes.csv").then(codes => {
             .transition()
             .duration(200)
             .style("opacity", 1);
-          d3.selectAll(`circle[song="${d["Track Name"]}"]`).attr(
+          d3.selectAll(`circle[url="${d["URL"]}"]`).attr(
             "stroke",
             "yellow"
           );
@@ -131,7 +132,7 @@ d3.csv("./country_codes.csv").then(codes => {
             .duration(200)
             .style("opacity", 0)
             .on("end", () => tooltip.classed("hidden", true));
-          d3.selectAll(`circle[song="${d["Track Name"]}"]`).attr(
+          d3.selectAll(`circle[url="${d["URL"]}"]`).attr(
             "stroke",
             "black"
           );
@@ -155,6 +156,7 @@ d3.csv("./country_codes.csv").then(codes => {
           transform: d =>
             `translate(${x(parseTime(d.Date))}, ${y(parseInt(d.Streams))})`,
           song: d => d["Track Name"],
+          url: d => d["URL"],
           r: d => r(parseInt(d.Streams))
         })
         .style("fill", d => color(parseInt(d.Streams)));
