@@ -53,7 +53,7 @@ const selectSong = d => {
     }
   }
   selectedSong = d["Track Name"];
-  selectedText.innerText = "Selected:"
+  selectedText.innerText = "Selected:";
   selectedSongText.href = d.URL;
   selectedSongText.innerText = d["Track Name"];
   d3.selectAll(`circle[songHash="${d["Track Name"].hashCode()}"]`)
@@ -83,7 +83,7 @@ const unhighlightSong = d => {
 };
 
 const unselectSong = () => {
-  selectedText.innerText = ""
+  selectedText.innerText = "";
   selectedSongText.innerText = "";
   d3.selectAll("circle")
     .transition()
@@ -101,9 +101,9 @@ const x = d3
 d3.csv("./country_codes.csv").then(codes => {
   d3.csv("./processed_data.csv").then(data => {
     let regions = d3.map(data, d => d.Region).keys();
-    regions.splice(regions.indexOf("global"), 1)
-    regions.sort()
-    regions.unshift("global")
+    regions.splice(regions.indexOf("global"), 1);
+    regions.sort();
+    regions.unshift("global");
 
     const select = d3.select("#country-select");
     select
@@ -207,10 +207,7 @@ d3.csv("./country_codes.csv").then(codes => {
             opacity: defaultOpacity
           };
         })
-        .style("fill", d => color(parseInt(d.Streams)))
-        .on("mouseover", highlightSong)
-        .on("mouseout", unhighlightSong)
-        .on("click", selectSong);
+        .style("fill", d => color(parseInt(d.Streams)));
 
       newCircles
         .transition()
@@ -221,7 +218,13 @@ d3.csv("./country_codes.csv").then(codes => {
           d => `translate(${x(parseTime(d.Date))}, ${y(parseInt(d.Streams))})`
         )
         .attr("r", d => r(parseInt(d.Streams)))
-        .attr("stroke", "none");
+        .attr("stroke", "none")
+        .on("end", function() {
+          d3.select(this)
+            .on("mouseover", highlightSong)
+            .on("mouseout", unhighlightSong)
+            .on("click", selectSong);
+        });
 
       circles
         .transition()
@@ -243,7 +246,7 @@ d3.csv("./country_codes.csv").then(codes => {
             .on("mouseover", highlightSong)
             .on("mouseout", unhighlightSong)
             .on("click", selectSong);
-        })
+        });
 
       if (selectedSong) {
         selectedSong = "";
