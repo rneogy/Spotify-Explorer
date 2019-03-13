@@ -40,8 +40,11 @@ select {
 
 a {
   color: rgb(131, 85, 1);
-  font-size: 1.3rem;
   transition: 200ms;
+}
+
+.large {
+  font-size: 1.3rem;
 }
 
 a:hover {
