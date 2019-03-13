@@ -18,6 +18,8 @@ const defaultOpacity = 0.7;
 const highlightOpacity = 0.85;
 const selectedOpacity = 1;
 const deselectedOpacity = 0.3;
+const defaultStrokeWidth = 2;
+const selectedStrokeWidth = 3;
 
 const parseTime = d3.timeParse("%Y-%m-%d");
 
@@ -37,7 +39,7 @@ const highlightSong = d => {
     .transition()
     .attr("opacity", highlightOpacity)
     .attr("stroke", "yellow")
-    .attr("stroke-width", 3);
+    .attr("stroke-width", selectedStrokeWidth);
 };
 
 const selectSong = d => {
@@ -58,7 +60,7 @@ const selectSong = d => {
   d3.selectAll(`circle:not([songHash="${d["Track Name"].hashCode()}"])`)
     .transition()
     .attr("stroke", "black")
-    .attr("stroke-width", 2)
+    .attr("stroke-width", defaultStrokeWidth)
     .attr("opacity", deselectedOpacity);
 };
 
@@ -72,7 +74,7 @@ const unhighlightSong = d => {
     .transition()
     .attr("stroke", "black")
     .attr("opacity", selectedSong ? deselectedOpacity : defaultOpacity)
-    .attr("stroke-width", 2);
+    .attr("stroke-width", defaultStrokeWidth);
 };
 
 const unselectSong = () => {
@@ -80,7 +82,7 @@ const unselectSong = () => {
   d3.selectAll("circle")
     .transition()
     .attr("stroke", "black")
-    .attr("stroke-width", 2)
+    .attr("stroke-width", defaultStrokeWidth)
     .attr("opacity", defaultOpacity);
 };
 
@@ -208,7 +210,7 @@ d3.csv("./country_codes.csv").then(codes => {
           d => `translate(${x(parseTime(d.Date))}, ${y(parseInt(d.Streams))})`
         )
         .attr("r", d => r(parseInt(d.Streams)))
-        .attr("stroke-width", 2);
+        .attr("stroke-width", defaultStrokeWidth);
 
       circles
         .transition()
@@ -221,7 +223,8 @@ d3.csv("./country_codes.csv").then(codes => {
           songHash: d => d["Track Name"].hashCode(),
           r: d => r(parseInt(d.Streams)),
           opacity: defaultOpacity,
-          stroke: "black"
+          stroke: "black",
+          "stroke-width": defaultStrokeWidth
         })
         .style("fill", d => color(parseInt(d.Streams)));
 
