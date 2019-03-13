@@ -11,12 +11,50 @@
     <link rel="stylesheet" type="text/css" href="index.css" />
   </head>
   <body>
-    <div class="container">
-      <div class="row mt-2 text-center">
-          <h1>
-            Design Rationale
-          </h1>
-      </div>
+    <div class="container my-5">
+      <h2>
+        Design Rationale
+      </h1>
+      <p>
+        We wanted to provide a way for the users of our visualization to explore the top-played music on Spotify in 2017. In particular, we thought it would be interesting to be able to explore the rise and fall of hits over time. It would also be interesting to allow for the discovery of different trends in music in different countries.
+      </p>
+      <p>
+        Our main two interaction techniques are 1. the ability to select the country to view data for, and 2. the ability to hover over and select all points corresponding to a single song. Selecting the country transforms the chart in realtime, allowing to get a simple comparison of scale between certain countries. Hovering over points gives you basic information including the title of a song and the number of times the song was streamed in that day. In addition, hovering a data point highlights all points that refer to the same song, emphasizing the trends of popularity for the song. Finally, selecting one of those trends increases the focus on that particular song by reducing the visibility of all other songs. You can even open up the song in Spotify by clicking on the song's title.
+      </p>
+      <p>
+        Our visual encodings include use of color, size, opacity, and highlighting via outline color. Color in the graph ranges from dark purple for songs with fewer streams to bright yellow for songs with more streams. Stream count is actually triply encoded through the height (y-axis), size, and color of the circles. This helps to visually highlight the differences in stream count. Opacity and outlining facilitate user interaction with the graph. Circles of the same song become more opaque and highlighted when they are hovered over, so that users can identify trends at-a-glance. Then, when the user selects a series to view, all other circles fade in opacity to allow the selected series to further stand out. This enables users to pre-attentively identify trends without too much effort.
+      </p>
+      <h2>
+        Development Process
+      </h1>
+      <p>
+        Our development process followed a pretty standard outline:
+      </p>
+      <ol>
+        <li>Finding a dataset</li>
+        <li>Sanitizing data</li>
+        <li>Exploring data and D3</li>
+        <li>Creating initial framework</li>
+        <li>Ideating and implementing prototype design</li>
+        <li>Getting user feedback</li>
+        <li>Adding features and fleshing out project</li>
+      </ol>
+      <p>
+        We started by looking for datasets that we would be interested in as a group. Through this process, we found the Spotify's Worldwide Daily Song Ranking on Kaggle. Working with the data was interesting, since the dataset was distributed to be used for machine learning purposes primarily. This resulted in us having way too much data (millions of points) to visualize simply, so the next step was sanitizing and filtering data to a manageable state. In short, we achieved this by looking at the top 10 songs (as opposed to the given 200) of every Monday of each week (as opposed to every day). This resulted in a reduction in data size of several magnitudes, which let us begin visualizing and exploring the dataset.
+      </p>
+      <p>
+        In the exploration process, we also spent a significant portion of the time learning the basic principles and patterns of D3, since we were not very well versed with the package. After working with some basic static plots of variables on two axes, we started to find enjoyment in observing trends of popular songs over time. In particular, we thought it was exciting to be able to identify the rise, the peak, and the fall of a particular song. Based on this principle, we continued to develop our prototype by focusing on this experience, leading to the development of the many features we have highlighted above.
+      </p>
+      <p>
+        We also did some simple user experience testing, where we received instrumental feedback on ways to improve our visualization, from better accessibility to more compelling design. This led to a change from difficult-to-read tooltips to statically-positioned help text, which dramatically improved readability of the chart. We also adjusted factors such as color and outline width, as well as modes of interaction, such as selecting to highlight all songs in a trend, due to constructive feedback from sample users.
+      </p>
+      <p>
+        The overall project took approximately 18 people-hours, often done in collaborative bursts of 3-4 hours. We spent a large amount of time on learning new features in D3, from simple visualizations, creating encodings, displaying axes, handling interactions, and animating transitions. We also allocated a significant amount of time to refactoring our original attempt at the visualization, since the process taught us more about the D3 mindset which we didn't follow at first, resulting in a lot of repetitive code.
+      </p>
+      <p>
+        The project, although intended to be split evenly, was distributed approximately equally between Rupayan and Emily, with Rishabh contributing at the dataset selection step.
+      </p>
+      <a href="index.html">Back</a>
     </div>
   </body>
 </html>
