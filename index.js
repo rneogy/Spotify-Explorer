@@ -35,6 +35,7 @@ const highlightSong = d => {
   if (selectedSong && d["Track Name"] === selectedSong) {
     return;
   }
+
   d3.selectAll(`circle[songHash="${d["Track Name"].hashCode()}"]`)
     .transition()
     .attr("opacity", highlightOpacity)
@@ -59,8 +60,9 @@ const selectSong = d => {
     .attr("opacity", selectedOpacity);
   d3.selectAll(`circle:not([songHash="${d["Track Name"].hashCode()}"])`)
     .transition()
-    .attr("stroke", "black")
+    .duration(500)
     .attr("stroke-width", defaultStrokeWidth)
+    .attr("stroke", "none")
     .attr("opacity", deselectedOpacity);
 };
 
@@ -72,7 +74,7 @@ const unhighlightSong = d => {
   }
   d3.selectAll(`circle[songHash="${d["Track Name"].hashCode()}"]`)
     .transition()
-    .attr("stroke", "black")
+    .attr("stroke", "none")
     .attr("opacity", selectedSong ? deselectedOpacity : defaultOpacity)
     .attr("stroke-width", defaultStrokeWidth);
 };
@@ -81,8 +83,9 @@ const unselectSong = () => {
   selectedSongText.innerText = "";
   d3.selectAll("circle")
     .transition()
-    .attr("stroke", "black")
+    .duration(500)
     .attr("stroke-width", defaultStrokeWidth)
+    .attr("stroke", "none")
     .attr("opacity", defaultOpacity);
 };
 
@@ -107,11 +110,11 @@ d3.csv("./country_codes.csv").then(codes => {
       .attr("value", d => d)
       .text(d => codes.filter(c => c.Code == d.toUpperCase())[0].Country);
 
-    const y = d3.scaleLinear();
+    y = d3.scaleLinear();
 
-    const r = d3.scaleLog().range([5, 20]);
+    r = d3.scaleLog().range([5, 20]);
 
-    const color = d3.scaleSequential().interpolator(d3.interpolatePlasma);
+    color = d3.scaleSequential().interpolator(d3.interpolatePlasma);
 
     const xAxis = d3.axisBottom().scale(x);
 
@@ -137,7 +140,7 @@ d3.csv("./country_codes.csv").then(codes => {
       const region = document.querySelector("#country-select").value;
       width = window.innerWidth;
       height = 0.9 * window.innerHeight;
-      const newData = data.filter(d => {
+      newData = data.filter(d => {
         if (region) {
           return d.Region === region;
         }
@@ -171,6 +174,11 @@ d3.csv("./country_codes.csv").then(codes => {
         .data(newData);
 
       circles
+        .on("mouseover", null)
+        .on("mouseout", null)
+        .on("click", null);
+
+      circles
         .exit()
         .transition()
         .duration(1000)
@@ -189,7 +197,6 @@ d3.csv("./country_codes.csv").then(codes => {
             cy: 0,
             r: 0,
             "stroke-width": 0,
-            stroke: "black",
             song: d["Track Name"],
             URL: d.URL,
             songHash: d["Track Name"].hashCode(),
@@ -210,7 +217,7 @@ d3.csv("./country_codes.csv").then(codes => {
           d => `translate(${x(parseTime(d.Date))}, ${y(parseInt(d.Streams))})`
         )
         .attr("r", d => r(parseInt(d.Streams)))
-        .attr("stroke-width", defaultStrokeWidth);
+        .attr("stroke", "none");
 
       circles
         .transition()
@@ -223,13 +230,20 @@ d3.csv("./country_codes.csv").then(codes => {
           songHash: d => d["Track Name"].hashCode(),
           r: d => r(parseInt(d.Streams)),
           opacity: defaultOpacity,
-          stroke: "black",
-          "stroke-width": defaultStrokeWidth
+          "stroke-width": defaultStrokeWidth,
+          stroke: "none"
         })
-        .style("fill", d => color(parseInt(d.Streams)));
+        .style("fill", d => color(parseInt(d.Streams)))
+        .on("end", function() {
+          d3.select(this)
+            .on("mouseover", highlightSong)
+            .on("mouseout", unhighlightSong)
+            .on("click", selectSong);
+        })
 
       if (selectedSong) {
         selectedSong = "";
+        selectedSongText.innerText = ""
       }
     };
 
