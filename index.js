@@ -7,7 +7,7 @@ const parseTime = d3.timeParse("%Y-%m-%d");
 const x = d3
   .scaleTime()
   .domain([new Date(2017, 0, 1), new Date(2018, 0, 8)])
-  .range([padding, width - padding]);
+  .range([2.5 * padding, width - padding]);
 
 d3.csv("./processed_data.csv").then(data => {
   const regions = d3.map(data, d => d.Region).keys();
@@ -28,7 +28,8 @@ d3.csv("./processed_data.csv").then(data => {
   const y = d3
     .scaleLinear()
     .domain(streamExtent)
-    .range([height - padding * 2, padding * 4]);
+    .range([height - padding * 1.5, padding * 2])
+    .nice();
 
   const r = d3
     .scaleLog()
@@ -116,6 +117,19 @@ d3.csv("./processed_data.csv").then(data => {
     .attr("id", "x-axis")
     .call(d3.axisBottom().scale(x));
 
+  const yAxis = d3
+    .axisRight(y)
+    .tickFormat(function(d) {
+      const s = d / 1e3;
+      return this.parentNode.nextSibling ? s : s + "k streams";
+    });
+
+  d3.select(".chart")
+    .append("g")
+    .attr("id", "y-axis")
+    .attr("transform", `translate(${padding}, 0)`)
+    .call(yAxis);
+
   select.on("change", function() {
     const newData = data.filter(
       d => d.Region == this.options[this.selectedIndex].value
@@ -123,9 +137,14 @@ d3.csv("./processed_data.csv").then(data => {
 
     streamExtent = d3.extent(newData, d => parseInt(d.Streams));
 
-    y.domain(streamExtent);
+    y.domain(streamExtent).nice();
     r.domain(streamExtent);
     color.domain(streamExtent);
+
+    d3.select("#y-axis")
+      .transition()
+      .duration(2000)
+      .call(yAxis);
 
     const circles = d3
       .select(".chart")
