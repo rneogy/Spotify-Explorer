@@ -32,7 +32,7 @@ let selectedSong;
 
 const highlightSong = d => {
   songText.innerText = d["Track Name"];
-  streamCountText.innerText = d.Streams / 1e3 + "k streams";
+  streamCountText.innerText = d3.format(".3~s")(d.Streams) + " streams";
   if (selectedSong && d["Track Name"] === selectedSong) {
     return;
   }
@@ -131,8 +131,8 @@ d3.csv("./country_codes.csv").then(codes => {
       .call(xAxis);
 
     const yAxis = d3.axisRight(y).tickFormat(function(d) {
-      const s = d / 1e3;
-      return this.parentNode.nextSibling ? s : s + "k streams";
+      const s = d3.format("~s")(d);
+      return this.parentNode.nextSibling ? s : s + " streams";
     });
 
     d3.select(".chart")
