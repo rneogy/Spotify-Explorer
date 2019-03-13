@@ -26,6 +26,7 @@ const parseTime = d3.timeParse("%Y-%m-%d");
 const songText = document.querySelector("#song-text");
 const streamCountText = document.querySelector("#stream-count-text");
 const selectedSongText = document.querySelector("#selected-song-text");
+const selectedText = document.querySelector("#selected-text");
 
 let selectedSong;
 
@@ -52,7 +53,9 @@ const selectSong = d => {
     }
   }
   selectedSong = d["Track Name"];
-  selectedSongText.innerText = "Selected: " + d["Track Name"];
+  selectedText.innerText = "Selected:"
+  selectedSongText.href = d.URL;
+  selectedSongText.innerText = d["Track Name"];
   d3.selectAll(`circle[songHash="${d["Track Name"].hashCode()}"]`)
     .transition()
     .attr("stroke", "orange")
@@ -80,6 +83,7 @@ const unhighlightSong = d => {
 };
 
 const unselectSong = () => {
+  selectedText.innerText = ""
   selectedSongText.innerText = "";
   d3.selectAll("circle")
     .transition()
@@ -243,7 +247,9 @@ d3.csv("./country_codes.csv").then(codes => {
 
       if (selectedSong) {
         selectedSong = "";
-        selectedSongText.innerText = ""
+        selectedSongText.href = "";
+        selectedText.innerText = "";
+        selectedSongText.innerText = "";
       }
     };
 
