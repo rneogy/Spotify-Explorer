@@ -12,21 +12,55 @@
   </head>
   <body>
     <div class="container my-5">
+      <h1>About Spotify Explorer</h1>
+      <hr />
+      <p>
+        This visualization was created as an assignment for MIT's Interactive
+        Data Visualization class (6.894). This experience focuses on dynamic and
+        interesting interaction techniques using d3.js. I built this experience
+        over the course of a couple weeks on a team of two others.
+      </p>
       <h2>
         Design Rationale
-      </h1>
+      </h2>
       <p>
-        We wanted to provide a way for the users of our visualization to explore the top-played music on Spotify in 2017. In particular, we thought it would be interesting to be able to explore the rise and fall of hits over time. It would also be interesting to allow for the discovery of different trends in music in different countries.
+        We wanted to provide a way for the users of our visualization to explore
+        the top-played music on Spotify in 2017. In particular, we thought it
+        would be interesting to be able to explore the rise and fall of hits
+        over time. It would also be interesting to allow for the discovery of
+        different trends in music in different countries.
       </p>
       <p>
-        Our main two interaction techniques are 1. the ability to select the country to view data for, and 2. the ability to hover over and select all points corresponding to a single song. Selecting the country transforms the chart in realtime, allowing to get a simple comparison of scale between certain countries. Hovering over points gives you basic information including the title of a song and the number of times the song was streamed in that day. In addition, hovering a data point highlights all points that refer to the same song, emphasizing the trends of popularity for the song. Finally, selecting one of those trends increases the focus on that particular song by reducing the visibility of all other songs. You can even open up the song in Spotify by clicking on the song's title.
+        Our main two interaction techniques are 1. the ability to select the
+        country to view data for, and 2. the ability to hover over and select
+        all points corresponding to a single song. Selecting the country
+        transforms the chart in realtime, allowing to get a simple comparison of
+        scale between certain countries. Hovering over points gives you basic
+        information including the title of a song and the number of times the
+        song was streamed in that day. In addition, hovering a data point
+        highlights all points that refer to the same song, emphasizing the
+        trends of popularity for the song. Finally, selecting one of those
+        trends increases the focus on that particular song by reducing the
+        visibility of all other songs. You can even open up the song in Spotify
+        by clicking on the song's title.
       </p>
       <p>
-        Our visual encodings include use of color, size, opacity, and highlighting via outline color. Color in the graph ranges from dark purple for songs with fewer streams to bright yellow for songs with more streams. Stream count is actually triply encoded through the height (y-axis), size, and color of the circles. This helps to visually highlight the differences in stream count. Opacity and outlining facilitate user interaction with the graph. Circles of the same song become more opaque and highlighted when they are hovered over, so that users can identify trends at-a-glance. Then, when the user selects a series to view, all other circles fade in opacity to allow the selected series to further stand out. This enables users to pre-attentively identify trends without too much effort.
+        Our visual encodings include use of color, size, opacity, and
+        highlighting via outline color. Color in the graph ranges from dark
+        purple for songs with fewer streams to bright yellow for songs with more
+        streams. Stream count is actually triply encoded through the height
+        (y-axis), size, and color of the circles. This helps to visually
+        highlight the differences in stream count. Opacity and outlining
+        facilitate user interaction with the graph. Circles of the same song
+        become more opaque and highlighted when they are hovered over, so that
+        users can identify trends at-a-glance. Then, when the user selects a
+        series to view, all other circles fade in opacity to allow the selected
+        series to further stand out. This enables users to pre-attentively
+        identify trends without too much effort.
       </p>
       <h2>
         Development Process
-      </h1>
+      </h2>
       <p>
         Our development process followed a pretty standard outline:
       </p>
@@ -40,13 +74,42 @@
         <li>Adding features and fleshing out project</li>
       </ol>
       <p>
-        We started by looking for datasets that we would be interested in as a group. Through this process, we found the <a href="https://www.kaggle.com/edumucelli/spotifys-worldwide-daily-song-ranking">Spotify's Worldwide Daily Song Ranking on Kaggle</a>. Working with the data was interesting, since the dataset was distributed to be used for machine learning purposes primarily. This resulted in us having way too much data (millions of points) to visualize simply, so the next step was sanitizing and filtering data to a manageable state. In short, we achieved this by looking at the top 10 songs (as opposed to the given 200) of every Monday of each week (as opposed to every day). This resulted in a reduction in data size of several magnitudes, which let us begin visualizing and exploring the dataset.
+        We started by looking for datasets that we would be interested in as a
+        group. Through this process, we found the
+        <a
+          href="https://www.kaggle.com/edumucelli/spotifys-worldwide-daily-song-ranking"
+          >Spotify's Worldwide Daily Song Ranking on Kaggle</a
+        >. Working with the data was interesting, since the dataset was
+        distributed to be used for machine learning purposes primarily. This
+        resulted in us having way too much data (millions of points) to
+        visualize simply, so the next step was sanitizing and filtering data to
+        a manageable state. In short, we achieved this by looking at the top 10
+        songs (as opposed to the given 200) of every Monday of each week (as
+        opposed to every day). This resulted in a reduction in data size of
+        several magnitudes, which let us begin visualizing and exploring the
+        dataset.
       </p>
       <p>
-        In the exploration process, we also spent a significant portion of the time learning the basic principles and patterns of D3, since we were not very well versed with the package. After working with some basic static plots of variables on two axes, we started to find enjoyment in observing trends of popular songs over time. In particular, we thought it was exciting to be able to identify the rise, the peak, and the fall of a particular song. Based on this principle, we continued to develop our prototype by focusing on this experience, leading to the development of the many features we have highlighted above.
+        In the exploration process, we also spent a significant portion of the
+        time learning the basic principles and patterns of D3, since we were not
+        very well versed with the package. After working with some basic static
+        plots of variables on two axes, we started to find enjoyment in
+        observing trends of popular songs over time. In particular, we thought
+        it was exciting to be able to identify the rise, the peak, and the fall
+        of a particular song. Based on this principle, we continued to develop
+        our prototype by focusing on this experience, leading to the development
+        of the many features we have highlighted above.
       </p>
       <p>
-        We also did some simple user experience testing, where we received instrumental feedback on ways to improve our visualization, from better accessibility to more compelling design. This led to a change from difficult-to-read tooltips to statically-positioned help text, which dramatically improved readability of the chart. We also adjusted factors such as color and outline width, as well as modes of interaction, such as selecting to highlight all songs in a trend, due to constructive feedback from sample users. Finally, we also made our visualization relatively responsive, making the chart scale to window size changes.
+        We also did some simple user experience testing, where we received
+        instrumental feedback on ways to improve our visualization, from better
+        accessibility to more compelling design. This led to a change from
+        difficult-to-read tooltips to statically-positioned help text, which
+        dramatically improved readability of the chart. We also adjusted factors
+        such as color and outline width, as well as modes of interaction, such
+        as selecting to highlight all songs in a trend, due to constructive
+        feedback from sample users. Finally, we also made our visualization
+        relatively responsive, making the chart scale to window size changes.
       </p>
       <a href="index.html" class="large">Back</a>
     </div>
